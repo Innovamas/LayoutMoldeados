@@ -12,43 +12,23 @@ const config = {
   database: process.env.DB_DATABASE,
   port: 1433,
   options: {
-    encrypt: true,
-    trustServerCertificate: false
+    encrypt: true
   },
   connectionTimeout: 30000,
   requestTimeout: 30000
 };
 
+
 // ===============================
 // Endpoint Movimientos Inventario
 // ===============================
-app.get("/MovimientosDeInventario", async (req, res) => {
+app.get("/test-connection", async (req, res) => {
   try {
-    const pool = await sql.connect(config);
-
-    const result = await pool.request().query(`
-      SELECT
-        CHARG,
-        LIFNR,
-        MENGE,
-        LGORT,
-        BWART,
-        MATNR,
-        BUDAT_MKPF
-      FROM MovimientosDeInventario
-      WHERE LGORT = 'M001'
-        AND BWART IN (101, 102)
-        AND MATNR = '110000016544'
-        AND BUDAT_MKPF >= DATEADD(MONTH, -1, CAST(GETDATE() AS DATE))
-    `);
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.json(result.recordset);
-
+    await sql.connect(config);
+    res.json({ status: "Conectado a SQL Server OK" });
   } catch (error) {
-    console.error("ERROR SQL:", error);
     res.status(500).json({
-      error: "Error consultando inventario",
+      error: "No conecta",
       detail: error.message
     });
   }
