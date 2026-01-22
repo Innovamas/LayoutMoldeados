@@ -34,20 +34,21 @@ app.get("/MovimientosDeInventario", async (req, res) => {
     const pool = await sql.connect(config);
 
     const result = await pool.request().query(`
-      SELECT TOP 100
-        CHARG,
-        LIFNR,
-        MENGE,
-        LGORT,
-        BWART,
-        MATNR,
-        BUDAT_MKPF
-      FROM MovimientosDeInventario WITH (NOLOCK)
-      WHERE BUDAT_MKPF >= CONVERT(INT, FORMAT(DATEADD(MONTH, -2, GETDATE()), 'yyyyMMdd'))
-        AND LGORT = 'M001'
-        AND BWART IN (101,102)
-        AND MATNR = '000000110000016544'
-      ORDER BY BUDAT_MKPF DESC
+      SELECT
+  CHARG,
+  LIFNR,
+  MENGE,
+  LGORT,
+  BWART,
+  MATNR,
+  BUDAT_MKPF
+FROM MovimientosDeInventario WITH (NOLOCK)
+WHERE BUDAT_MKPF >= CONVERT(INT, FORMAT(DATEADD(MONTH, -1, GETDATE()), 'yyyyMMdd'))
+  AND LGORT = 'M001'
+  AND BWART IN (101,102)
+  AND MATNR = '000000110000016544'
+ORDER BY BUDAT_MKPF DESC
+
     `);
 
     res.setHeader("Access-Control-Allow-Origin", "*");
