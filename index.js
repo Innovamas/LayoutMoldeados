@@ -34,7 +34,7 @@ app.get("/MovimientosDeInventario", async (req, res) => {
       WHERE LGORT = 'M001'
         AND BWART IN (101, 102)
         AND MATNR = '110000016544'
-        AND BUDAT_MKPF >= DATEADD(MONTH, -2, CAST(GETDATE() AS DATE))
+        AND BUDAT_MKPF >= DATEADD(MONTH, -1, CAST(GETDATE() AS DATE))
     `);
 
     res.json(result.recordset);
