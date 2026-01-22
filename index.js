@@ -4,7 +4,9 @@ const sql = require("mssql");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuración SQL Server
+// ===============================
+// Configuración SQL Server (SAP)
+// ===============================
 const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -15,8 +17,13 @@ const config = {
     encrypt: true,
     trustServerCertificate: false
   },
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000
+  },
   connectionTimeout: 30000,
-  requestTimeout: 30000
+  requestTimeout: 60000 // ⬅️ IMPORTANTE
 };
 
 // ===============================
@@ -27,18 +34,24 @@ app.get("/MovimientosDeInventario", async (req, res) => {
     const pool = await sql.connect(config);
 
     const result = await pool.request().query(`
-    SELECT TOP 100
-  CHARG, LIFNR, MENGE, LGORT, BWART, MATNR, BUDAT_MKPF
-FROM MovimientosDeInventario
-WHERE LGORT = 'M001'
-  AND BWART IN (101,102)
-  AND MATNR = '000000110000016544'
-ORDER BY BUDAT_MKPF DESC
-
+      SELECT TOP 100
+        CHARG,
+        LIFNR,
+        MENGE,
+        LGORT,
+        BWART,
+        MATNR,
+        BUDAT_MKPF
+      FROM MovimientosDeInventario WITH (NOLOCK)
+      WHERE BUDAT_MKPF >= CONVERT(INT, FORMAT(DATEADD(MONTH, -2, GETDATE()), 'yyyyMMdd'))
+        AND LGORT = 'M001'
+        AND BWART IN (101,102)
+        AND MATNR = '000000110000016544'
+      ORDER BY BUDAT_MKPF DESC
     `);
 
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.json(result.recordset);
+    res.status(200).json(result.recordset);
 
   } catch (error) {
     console.error("ERROR SQL:", error);
@@ -57,6 +70,12 @@ app.get("/", (req, res) => {
 });
 
 // ===============================
+// Start server
+// ===============================
+app.listen(PORT, () => {
+  console.log(`API corriendo en puerto ${PORT}`);
+});
+
 // Start server
 // ===============================
 app.listen(PORT, () => {
