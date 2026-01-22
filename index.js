@@ -32,7 +32,7 @@ app.get("/MovimientosDeInventario", async (req, res) => {
 FROM MovimientosDeInventario
 WHERE LGORT = 'M001'
   AND BWART IN (101,102)
-  AND MATNR = '110000016544'
+  AND MATNR = '000000110000016544'
 ORDER BY BUDAT_MKPF DESC
 
     `);
