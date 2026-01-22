@@ -22,14 +22,13 @@ const config = {
 // ===============================
 // Endpoint Movimientos Inventario
 // ===============================
-app.get("/test-table", async (req, res) => {
+app.get("/test-simple", async (req, res) => {
   try {
     const pool = await sql.connect(config);
 
     const result = await pool.request().query(`
-      SELECT TOP 5 name
-      FROM sys.tables
-      WHERE name = 'MovimientosDeInventario'
+      SELECT TOP 5 *
+      FROM MovimientosDeInventario
     `);
 
     res.json(result.recordset);
@@ -37,6 +36,7 @@ app.get("/test-table", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 // ===============================
