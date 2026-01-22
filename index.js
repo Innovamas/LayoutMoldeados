@@ -19,7 +19,9 @@ const config = {
   requestTimeout: 30000
 };
 
-// 🔹 Endpoint Movimientos de Inventario
+// ===============================
+// Endpoint Movimientos Inventario
+// ===============================
 app.get("/MovimientosDeInventario", async (req, res) => {
   try {
     const pool = await sql.connect(config);
@@ -52,17 +54,16 @@ app.get("/MovimientosDeInventario", async (req, res) => {
   }
 });
 
-// 🔹 Health check (Render)
+// ===============================
+// Health check Render
+// ===============================
 app.get("/", (req, res) => {
   res.send("API Layout Moldeados OK");
 });
 
+// ===============================
+// Start server
+// ===============================
 app.listen(PORT, () => {
   console.log(`API corriendo en puerto ${PORT}`);
-});
-
-});
-
-app.listen(3000, () => {
-  console.log("API Costeo-Panovo MM60 corriendo en puerto 3000");
 });
