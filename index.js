@@ -14,22 +14,20 @@ const config = {
   }
 };
 
-// Endpoint para leer Proveedores
-app.get("/Proveedores", async (req, res) => {
+// Endpoint para leer Entradas de Paca de Cartón
+app.get("/MovimientosDeInventario", async (req, res) => {
   try {
     const pool = await sql.connect(config);
 
     const result = await pool.request().query(`
-      SELECT LIFNR, NAME1 
-      FROM Proveedores
+      SELECT
+        CHARG, LIFNR, MENGE, LGORT, BWART, MATNR, BUDAT_MKPF      
+      FROM MovimientosDeInventario
+      WHERE LGORT = 'M001'
+        AND BWART IN (101, 102)
+        AND MATNR = '110000016544'
+        AND BUDAT_MKPF >= DATEADD(DAY, -2, CAST(GETDATE() AS DATE))
     `);
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.json(result.recordset);
-  } catch (err) {
-    res.status(500).json({ error: err.toString() });
-  }
-});
 
 // Endpoint para leer PedidosDeCompra_Ekpo
 app.get("/PedidosDeCompra_Ekpo", async (req, res) => {
