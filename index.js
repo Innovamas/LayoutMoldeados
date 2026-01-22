@@ -2,7 +2,7 @@ const express = require("express");
 const sql = require("mssql");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // ===============================
 // Configuración SQL Server (SAP)
@@ -23,7 +23,7 @@ const config = {
     idleTimeoutMillis: 30000
   },
   connectionTimeout: 30000,
-  requestTimeout: 60000 // ⬅️ IMPORTANTE
+  requestTimeout: 60000 // ⬅️ CLAVE para SAP
 };
 
 // ===============================
@@ -70,14 +70,9 @@ app.get("/", (req, res) => {
 });
 
 // ===============================
-// Start server
+// Start server (UNA SOLA VEZ)
 // ===============================
 app.listen(PORT, () => {
   console.log(`API corriendo en puerto ${PORT}`);
 });
 
-// Start server
-// ===============================
-app.listen(PORT, () => {
-  console.log(`API corriendo en puerto ${PORT}`);
-});
