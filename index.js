@@ -22,17 +22,22 @@ const config = {
 // ===============================
 // Endpoint Movimientos Inventario
 // ===============================
-app.get("/test-connection", async (req, res) => {
+app.get("/test-table", async (req, res) => {
   try {
-    await sql.connect(config);
-    res.json({ status: "Conectado a SQL Server OK" });
+    const pool = await sql.connect(config);
+
+    const result = await pool.request().query(`
+      SELECT TOP 5 name
+      FROM sys.tables
+      WHERE name = 'MovimientosDeInventario'
+    `);
+
+    res.json(result.recordset);
   } catch (error) {
-    res.status(500).json({
-      error: "No conecta",
-      detail: error.message
-    });
+    res.status(500).json({ error: error.message });
   }
 });
+
 
 // ===============================
 // Health check Render
