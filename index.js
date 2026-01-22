@@ -39,9 +39,13 @@ app.get("/MovimientosDeInventario", async (req, res) => {
 
     res.json(result.recordset);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error consultando inventario" });
-  }
+  console.error("ERROR SQL:", error);
+  res.status(500).json({
+    error: "Error consultando inventario",
+    detail: error.message
+  });
+}
+
 });
 
 // Health check (IMPORTANTE para Render)
