@@ -1,57 +1,47 @@
-import express from "express";
-import cors from "cors";
-import sql from "mssql";
+const express = require("express");
+const sql = require("mssql");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-
-// 🔹 Configuración SQL Server (SAP)
-const sqlConfig = {
+// Configuración SQL Server
+const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   server: process.env.DB_SERVER,
   database: process.env.DB_DATABASE,
+  port: 1433,
   options: {
-    encrypt: false,
-    trustServerCertificate: true
+    encrypt: true,
+    trustServerCertificate: false
   },
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000
-  },
-  requestTimeout: 60000 // ⬅️ clave para tablas grandes SAP
+  connectionTimeout: 30000,
+  requestTimeout: 30000
 };
 
-// 🔹 Endpoint principal
+// ===============================
+// Endpoint Movimientos Inventario
+// ===============================
 app.get("/MovimientosDeInventario", async (req, res) => {
   try {
-    const pool = await sql.connect(sqlConfig);
+    const pool = await sql.connect(config);
 
     const result = await pool.request().query(`
-      SELECT TOP 100
-        CHARG,
-        LIFNR,
-        MENGE,
-        LGORT,
-        BWART,
-        MATNR,
-        BUDAT_MKPF
-      FROM MovimientosDeInventario WITH (NOLOCK)
-      WHERE BUDAT_MKPF >= CONVERT(INT, FORMAT(DATEADD(MONTH, -2, GETDATE()), 'yyyyMMdd'))
-        AND LGORT = 'M001'
-        AND BWART IN (101, 102)
-        AND MATNR = '000000000110000016544'
-      ORDER BY BUDAT_MKPF DESC
+    SELECT TOP 100
+  CHARG, LIFNR, MENGE, LGORT, BWART, MATNR, BUDAT_MKPF
+FROM MovimientosDeInventario
+WHERE LGORT = 'M001'
+  AND BWART IN (101,102)
+  AND MATNR = '110000016544'
+ORDER BY BUDAT_MKPF DESC
+
     `);
 
-    res.status(200).json(result.recordset);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.json(result.recordset);
 
   } catch (error) {
-    console.error("Error consultando inventario:", error);
+    console.error("ERROR SQL:", error);
     res.status(500).json({
       error: "Error consultando inventario",
       detail: error.message
@@ -59,13 +49,16 @@ app.get("/MovimientosDeInventario", async (req, res) => {
   }
 });
 
-// 🔹 Health check (Render lo necesita)
+// ===============================
+// Health check Render
+// ===============================
 app.get("/", (req, res) => {
   res.send("API Layout Moldeados OK");
 });
 
-// 🔹 Arranque del servidor
+// ===============================
+// Start server
+// ===============================
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`API corriendo en puerto ${PORT}`);
 });
-
